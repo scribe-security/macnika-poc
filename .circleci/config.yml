@@ -1,0 +1,177 @@
+version: 2.1
+
+executors:
+  builder:
+    machine: true
+  deployer:
+    docker:
+      - image: minepicco/cc-build-image:latest
+
+workflows:
+  
+  build-deploy:
+    jobs:
+      - build_scan:
+          context: webpage_deployment
+      - push:
+          context: webpage_deployment
+          requires:
+            - build_scan
+      - hold:
+          type: approval
+          requires:
+            - build_scan
+      - deploy:
+          requires:
+            - hold
+          context: webpage_deployment
+
+jobs:
+  build_scan:
+    executor: builder
+    
+    environment:
+      imagename: "scribe-poc"
+      
+    steps:
+      - checkout
+                     
+      - run:
+          name: Build Image
+          command: |
+            docker login -u $docker_user -p $docker_pass
+            docker build --tag "buildimage:${CIRCLE_BUILD_NUM}" .
+
+      - run:
+          name: "simple test"
+          command: |
+            docker run --rm --name web -p 80:80 -d "buildimage:${CIRCLE_BUILD_NUM}"
+            sleep 1 && curl http://localhost
+            docker stop web
+
+      - run:
+          name: "Twistlock Vuln/Compliance check"
+          command: |
+            curl -k -u "${pc_user}:${pc_pass}" --output twistcli "${pc_url}/api/v1/util/twistcli" 
+            chmod a+x twistcli
+            sudo ./twistcli images scan --address "${pc_url}" -u "${pc_user}" -p "${pc_pass}" "buildimage:${CIRCLE_BUILD_NUM}" --details
+
+      - run:
+          name: save image and image name to workspace
+          command: |
+            mkdir -p /tmp/workspace
+            docker save "buildimage:${CIRCLE_BUILD_NUM}" > "/tmp/workspace/image.tar"
+            repo=$(echo ${awsEndpoint} | cut -d / -f 3)
+            echo "image=${repo}/${CIRCLE_PROJECT_REPONAME,,}:${CIRCLE_BUILD_NUM}" > /tmp/workspace/env.txt
+
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - image.tar
+            - env.txt
+
+      - run:
+          name: "Triage vulnerabilities"
+          command: |
+            ./getPrismaData.sh
+            ./triage.sh
+
+  push:
+    executor: deployer
+    environment:
+      imagename: "macnicadevops"
+      
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: load image
+          command: |
+            docker load -i "/tmp/workspace/image.tar"
+
+      - run:
+          name: configure aws
+          command: |
+            aws configure set aws_access_key_id "${awackey}"
+            aws configure set aws_secret_access_key "${awsekey}"
+            aws configure set region "${awregion}"
+            aws configure set output "json"
+            
+      - run:
+          name: Publish Image
+          command: |
+            source /tmp/workspace/env.txt
+            build_num=$(echo ${image} | cut -d ':' -f 2)
+            aws ecr get-login-password --region ${awregion} | docker login --username AWS --password-stdin ${awsEndpoint}
+            docker tag "buildimage:${build_num}" "${image}"
+            docker push "${image}"
+
+  deploy:
+    executor: deployer
+    environment:
+      comp: "low"
+      imagename: "macnicadevops"
+      
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: Configure gcloud cli
+          command: |
+            echo $key>key.json
+            gcloud auth activate-service-account --key-file=key.json
+            gcloud beta container clusters get-credentials $cluster --region $region --project $project
+
+      - run:
+          name: configure aws
+          command: |
+            aws configure set aws_access_key_id "${awackey}"
+            aws configure set aws_secret_access_key "${awsekey}"
+            aws configure set region "${awregion}"
+            aws configure set output "json"
+
+      - run:
+          name: Create Kubernetes Manifest
+          command: |
+            source /tmp/workspace/env.txt
+            deploy_image="${image}"
+            cat manifest_template.yaml | sed -e "s@-Image_Name-@${deploy_image}@g" | sed -e "s@-Namespace-@${CIRCLE_PROJECT_REPONAME,,}@g" > web.yaml
+
+      - run:
+          name: Login to aws and when ns or secret does not exist, create manifest and apply
+          command: |
+            source /tmp/workspace/env.txt
+            aws ecr get-login-password --region ${awregion} | docker login --username AWS --password-stdin ${awsEndpoint}
+            if [ $(kubectl get ns -n ${CIRCLE_PROJECT_REPONAME,,} | grep -c ${CIRCLE_PROJECT_REPONAME,,}) -eq 1 ];then
+              echo "namespace exists"
+            else
+              cat ns_template.yaml | sed -e "s@-Namespace-@${CIRCLE_PROJECT_REPONAME,,}@g" > ns.yaml
+              kubectl apply -f ns.yaml
+              echo "namespace created"
+            fi
+            TOKEN=$(aws ecr get-login-password)
+            REG=$(echo ${image} | cut -d / -f 1)
+            kubectl create secret docker-registry ecr-token \
+              --docker-server=${REG} \
+              --docker-username=AWS \
+              --namespace=${CIRCLE_PROJECT_REPONAME,,} \
+              --docker-password=${TOKEN} --dry-run=client -o yaml > ecr-secret.yaml
+            kubectl apply -f ecr-secret.yaml
+
+      - run:
+          name: Triage ECR vulnerability scan result with LeanSeeks
+          command: |
+            ./getECRData.sh
+            ./triage.sh
+
+      - run:
+          name: deployment
+          command: |
+            kubectl apply -f web.yaml
+            kubectl get pods -n "${CIRCLE_PROJECT_REPONAME,,}"
