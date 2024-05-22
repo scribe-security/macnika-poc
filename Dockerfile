@@ -6,5 +6,5 @@ RUN npm install -g http-server
 COPY index.html / 
 RUN chmod +x /index.html
 HEALTHCHECK CMD curl http://localhost
-CMD ["http-server", "/", "-p", "8080"]
+CMD ["http-server"]
 EXPOSE 8080
