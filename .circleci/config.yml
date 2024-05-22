@@ -45,8 +45,8 @@ jobs:
       - run:
           name: "simple test"
           command: |
-            docker run --rm --name web -p 80:80 -d "buildimage:${CIRCLE_BUILD_NUM}"
-            sleep 1 && curl http://localhost
+            docker run --rm --name web -p 8080:8080 -d "buildimage:${CIRCLE_BUILD_NUM}"
+            sleep 1 && curl http://localhost:8080
             docker stop web
 
       - run:
