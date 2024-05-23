@@ -53,7 +53,7 @@ while true
               curl -X 'GET' "${ls_url_demo}/api/triage-results/${triage_id}/status" -H 'accept: application/json' -H 'Accept-Language: ja' -H "Authorization: Bearer ${ls_token_demo}" -H 'Content-Type: application/json' -H "$ua" -o t_result.json
               status=$(cat t_result.json | jq -r ".triage.status")
               echo "statusは「${status}」です"
-              if [ "${status}" == "成功" ]; then
+              if [ "${status}" == "成功" -o "${status}" == "Completed" ]; then
                 cat t_result.json | jq -r ".triage"
                 if [ $(cat t_result.json | jq -r ".triage.level5VulnerabilityCounts") != 0 ]; then
                   echo "緊急対処が必要な脆弱性が見つかりました！"
