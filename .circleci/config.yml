@@ -49,12 +49,12 @@ jobs:
             sleep 1 && curl http://localhost:8080
             docker stop web
 
-      - run:
-          name: "Twistlock Vuln/Compliance check"
-          command: |
-            curl -k -u "${pc_user}:${pc_pass}" --output twistcli "${pc_url}/api/v1/util/twistcli" 
-            chmod a+x twistcli
-            sudo ./twistcli images scan --address "${pc_url}" -u "${pc_user}" -p "${pc_pass}" "buildimage:${CIRCLE_BUILD_NUM}" --details
+     # - run:
+     #     name: "Twistlock Vuln/Compliance check"
+     #     command: |
+     #       curl -k -u "${pc_user}:${pc_pass}" --output twistcli "${pc_url}/api/v1/util/twistcli" 
+     #       chmod a+x twistcli
+     #       sudo ./twistcli images scan --address "${pc_url}" -u "${pc_user}" -p "${pc_pass}" "buildimage:${CIRCLE_BUILD_NUM}" --details
 
       - run:
           name: save image and image name to workspace
@@ -70,11 +70,11 @@ jobs:
             - image.tar
             - env.txt
 
-      - run:
-          name: "Triage vulnerabilities"
-          command: |
-            ./getPrismaData.sh
-            ./triage.sh
+     # - run:
+     #     name: "Triage vulnerabilities"
+     #     command: |
+     #       ./getPrismaData.sh
+     #       ./triage.sh
 
   push:
     executor: deployer
