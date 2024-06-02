@@ -95,9 +95,11 @@ jobs:
       - run:
           name: configure aws
           command: |
-            aws configure set aws_access_key_id AKIA2GYATACWL2V63NN4
-            aws configure set aws_secret_access_key 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
-            aws configure set region "us-west-2"
+            echo ${awacke}
+            echo ----------------------
+            aws configure set aws_access_key_id ${awacke}
+            aws configure set aws_secret_access_key ${awsekey}
+            aws configure set region ${awregion}
             aws configure set output "json"
             
       - run:
