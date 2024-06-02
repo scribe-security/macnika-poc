@@ -59,7 +59,7 @@ jobs:
       - run:
           name: save image and image name to workspace
           command: |
-            mkdir -p /tmp/workspace
+            # mkdir -p /tmp/workspace
             docker save "buildimage:${CIRCLE_BUILD_NUM}" > "/tmp/workspace/image.tar"
             repo=$(echo ${awsEndpoint} | cut -d / -f 3)
             echo "image=${repo}/${CIRCLE_PROJECT_REPONAME,,}:${CIRCLE_BUILD_NUM}" > /tmp/workspace/env.txt
