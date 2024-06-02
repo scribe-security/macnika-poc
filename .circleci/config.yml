@@ -95,10 +95,10 @@ jobs:
       - run:
           name: configure aws
           command: |
-            aws configure set aws_access_key_id "${awackey}"
-            aws configure set aws_secret_access_key "${awsekey}"
-            aws configure set region "${awregion}"
-            aws configure set output "json"
+            aws configure set aws_access_key_id ${awackey}
+            aws configure set aws_secret_access_key ${awsekey}
+            aws configure set region ${awregion}
+            aws configure set output json
             
       - run:
           name: Publish Image
