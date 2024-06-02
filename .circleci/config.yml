@@ -107,7 +107,7 @@ jobs:
             build_num=$(echo ${image} | cut -d ':' -f 2)
             aws ecr get-login-password --region ${awregion} | docker login --username AWS --password-stdin ${awsEndpoint}
             docker tag "buildimage:${build_num}" "${image}"
-            docker push "${image}"
+            # docker push "${image}"
 
   deploy:
     executor: deployer
