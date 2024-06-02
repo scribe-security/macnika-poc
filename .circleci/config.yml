@@ -59,7 +59,7 @@ jobs:
       - run:
           name: save image and image name to workspace
           command: |
-            # mkdir -p /tmp/workspace
+            mkdir -p /tmp/workspace
             docker save "buildimage:${CIRCLE_BUILD_NUM}" > "/tmp/workspace/image.tar"
             repo=$(echo ${awsEndpoint} | cut -d / -f 3)
             echo "image=${repo}/${CIRCLE_PROJECT_REPONAME,,}:${CIRCLE_BUILD_NUM}" > /tmp/workspace/env.txt
@@ -99,13 +99,14 @@ jobs:
             aws configure set aws_secret_access_key "${awsekey}"
             aws configure set region "${awregion}"
             aws configure set output "json"
-            
+            aws ecr get-login-password --region ${awregion} 
       - run:
           name: Publish Image
           command: |
             source /tmp/workspace/env.txt
             build_num=$(echo ${image} | cut -d ':' -f 2)
-            aws ecr get-login-password --region ${awregion} #| docker login --username AWS --password-stdin ${awsEndpoint}
+            aws ecr get-login-password --region ${awregion} 
+            #| docker login --username AWS --password-stdin ${awsEndpoint}
             # docker tag "buildimage:${build_num}" "${image}"
             # docker push "${image}"
 
