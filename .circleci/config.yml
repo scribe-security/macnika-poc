@@ -105,7 +105,7 @@ jobs:
           command: |
             source /tmp/workspace/env.txt
             build_num=$(echo ${image} | cut -d ':' -f 2)
-            aws ecr get-login-password --region ${awregion} | docker login --username AWS --password-stdin ${awsEndpoint}
+            aws ecr get-login-password --region ${awregion} #| docker login --username AWS --password-stdin ${awsEndpoint}
             # docker tag "buildimage:${build_num}" "${image}"
             # docker push "${image}"
 
