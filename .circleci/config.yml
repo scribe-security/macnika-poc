@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  orbs: scribe-security/orbs@1.4.2
 
 executors:
   builder:
@@ -35,6 +37,14 @@ jobs:
       
     steps:
       - checkout
+      - scribe/install
+      - scribe/bom:
+          target: dir:.
+          verbose: 2
+          scribe-enable: true
+          product-key: circle.pre-release.bom
+          scribe-client-secret: $scribetoken
+          
                      
       - run:
           name: Build Image
