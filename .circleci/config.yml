@@ -52,6 +52,13 @@ jobs:
           command: |
             docker login -u $docker_user -p $docker_pass
             docker build --tag "buildimage:${CIRCLE_BUILD_NUM}" .
+      - scribe/install
+      - scribe/bom:
+          target: "buildimage:${CIRCLE_BUILD_NUM}"
+          verbose: 2
+          scribe-enable: true
+          product-key: circle.pre-release.bom
+          scribe-client-secret: $scribetoken
 
       - run:
           name: "simple test"
