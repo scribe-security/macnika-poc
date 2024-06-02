@@ -37,15 +37,7 @@ jobs:
       imagename: "scribe-poc"
       
     steps:
-      - checkout
-      - scribe/install
-      - scribe/bom:
-          target: dir:.
-          verbose: 2
-          scribe-enable: true
-          product-key: circle.pre-release.bom
-          scribe-client-secret: $scribetoken
-          
+      - checkout         
                      
       - run:
           name: Build Image
