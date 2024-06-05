@@ -47,7 +47,10 @@ jobs:
           command: |
             export ATTEST_KEY=$(echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r' )
             export ATTEST_CERT=$(echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r' )
-            export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )       
+            export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
+            echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r'  > key.pem
+            echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r'  > cert.pem
+            echo $ATTEST_CA_B64 | base64 -d | tr -d '\r'  > ca.pem      
             printenv
       - run:
           name: Build Image
@@ -67,10 +70,10 @@ jobs:
           product-key: circle.pre-release.bom
           scribe-client-secret: $scribetoken
           format: "attest"
-          attest-default: x509-env
-        
-          
-          
+          attest-default: x509
+          attest-key: key.pem
+          attest-cert: cert.pem
+          attest-ca: ca.pem
 
       - run:
           name: "simple test"
