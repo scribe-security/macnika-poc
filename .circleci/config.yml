@@ -52,7 +52,7 @@ jobs:
           product-key: circle.pre-release.bom
           scribe-client-secret: $scribetoken
           format: "attest"
-          attest.default: x509
+          attest-default: x509
           ca: $ca_cert
           cert: $cert
           key: $signer_key
