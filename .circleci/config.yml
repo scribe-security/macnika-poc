@@ -36,9 +36,9 @@ jobs:
     
     environment:
       imagename: "scribe-poc"
-   #   ATTEST_KEY: $attest_key
-   #   ATTEST_CERT: $attest_cer
-   #   ATTEST_CA: $attest_ca
+    #  ATTEST_KEY: $attest_key
+    #  ATTEST_CERT: $attest_cer
+    #  ATTEST_CA: $attest_ca
       
     steps:
       - checkout         
@@ -55,6 +55,11 @@ jobs:
             docker login -u $docker_user -p $docker_pass
             docker build --tag "buildimage:${CIRCLE_BUILD_NUM}" .
       - scribe/install
+      - run:
+          command: |
+            echo $ATTEST_KEY
+            echo $ATTEST_CERT
+            echo $ATTEST_CA
       - scribe/bom:
           target: "buildimage:${CIRCLE_BUILD_NUM}"
           verbose: 2
