@@ -71,9 +71,9 @@ jobs:
           scribe-client-secret: $scribetoken
           format: "attest"
           attest-default: x509
-          attest-key: key.pem
-          attest-cert: cert.pem
-          attest-ca: ca.pem
+          key: key.pem
+          cert: cert.pem
+          ca: ca.pem
 
       - run:
           name: "simple test"
