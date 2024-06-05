@@ -45,9 +45,6 @@ jobs:
       - run:
           name: export KEY envs
           command: |
-            export ATTEST_KEY=$(echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r' )
-            export ATTEST_CERT=$(echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r' )
-            export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
             echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r'  > key.pem
             echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r'  > cert.pem
             echo $ATTEST_CA_B64 | base64 -d | tr -d '\r'  > ca.pem      
@@ -58,11 +55,6 @@ jobs:
             docker login -u $docker_user -p $docker_pass
             docker build --tag "buildimage:${CIRCLE_BUILD_NUM}" .
       - scribe/install
-      - run:
-          command: |
-            echo $ATTEST_KEY
-            echo $ATTEST_CERT
-            echo $ATTEST_CA
       - scribe/bom:
           target: "buildimage:${CIRCLE_BUILD_NUM}"
           verbose: 2
