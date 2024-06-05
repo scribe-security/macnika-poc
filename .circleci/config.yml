@@ -57,10 +57,7 @@ jobs:
           scribe-client-secret: $scribetoken
           format: "attest"
           attest-default: x509-env
-          ca: $ca_cert
-          cert: $cert
-          key: $signer_key
-          
+        
           
           
 
