@@ -3,6 +3,7 @@ orbs:
   orbs: scribe-security/orbs@1.4.2
   scribe: scribe-security/orbs@1.4.2
 
+
 executors:
   builder:
     machine: true
@@ -35,6 +36,9 @@ jobs:
     
     environment:
       imagename: "scribe-poc"
+   #   ATTEST_KEY: $attest_key
+   #   ATTEST_CERT: $attest_cer
+   #   ATTEST_CA: $attest_ca
       
     steps:
       - checkout         
@@ -52,7 +56,7 @@ jobs:
           product-key: circle.pre-release.bom
           scribe-client-secret: $scribetoken
           format: "attest"
-          attest-default: x509
+          attest-default: x509-env
           ca: $ca_cert
           cert: $cert
           key: $signer_key
