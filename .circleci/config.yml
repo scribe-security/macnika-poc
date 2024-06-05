@@ -42,7 +42,12 @@ jobs:
       
     steps:
       - checkout         
-                     
+      - run:
+          name: export KEY envs
+          command: |
+            export ATTEST_KEY=$(echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r' )
+            export ATTEST_CERT=$(echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r' )
+            export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )               
       - run:
           name: Build Image
           command: |
