@@ -66,6 +66,7 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
+          context-type: github
       - scribe/slsa:
           target: "buildimage:${CIRCLE_BUILD_NUM}"
           verbose: 2
@@ -77,6 +78,7 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
+          context-type: github
 
       - run:
           name: "simple test"
