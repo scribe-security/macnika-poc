@@ -66,6 +66,17 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
+      - scribe/slsa:
+          target: "buildimage:${CIRCLE_BUILD_NUM}"
+          verbose: 2
+          scribe-enable: true
+          product-key: circle.pre-release.bom
+          scribe-client-secret: $scribetoken
+          format: "attest"
+          attest-default: x509
+          key: key.pem
+          cert: cert.pem
+          ca: ca.pem
 
       - run:
           name: "simple test"
