@@ -57,6 +57,7 @@ jobs:
       - scribe/install
       - scribe/bom:
           target: "buildimage:${CIRCLE_BUILD_NUM}"
+          context-type: github
           verbose: 2
           scribe-enable: true
           product-key: circle.pre-release.bom
@@ -66,7 +67,7 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
-          context-type: github
+          
       - scribe/slsa:
           target: "buildimage:${CIRCLE_BUILD_NUM}"
           verbose: 2
