@@ -1,6 +1,6 @@
 name: Docker Image CI with provenance
 env:
-   APP_NAME: Sky-Mapper
+   APP_NAME: Mac-Github
    PRODUCT_VERSION: 1.2.1
 on:
   push:
