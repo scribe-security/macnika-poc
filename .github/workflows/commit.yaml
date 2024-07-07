@@ -3,10 +3,7 @@ env:
    APP_NAME: Mac-Github
    PRODUCT_VERSION: 1.2.1
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
 
