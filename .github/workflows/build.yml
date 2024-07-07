@@ -33,7 +33,7 @@ jobs:
           format: attest
           config: .valint.yaml
           verbose: 2
-          deliverable: true
+         
 
     - name: Generate signed SBOM for docker image
       uses: scribe-security/action-bom@master
@@ -45,6 +45,7 @@ jobs:
           scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
           format: attest
           config: .valint.yaml
+          verbose: 2
 
     - name: Generate SLSA provenance docker image
       uses: scribe-security/action-slsa@master
@@ -56,6 +57,7 @@ jobs:
           scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
           format: attest
           config: .valint.yaml
+          verbose: 2
           
 
     - name: Run the Docker image
