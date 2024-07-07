@@ -1,0 +1,39 @@
+name: Docker Image commit
+env:
+   APP_NAME: Mac-Github
+   PRODUCT_VERSION: 1.2.1
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}
+
+    - name: Generate signed SBOM for repo content clone
+      uses: scribe-security/action-bom@master
+      with:
+          target: 'git:.'
+          scribe-enable: true
+          product-key: ${{ env.APP_NAME }}
+          product-version: ${{env.PRODUCT_VERSION}} #${{env.GITHUB_RUN_NUM}}
+          scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
+          components: commits,packages,files,dep
+          format: attest
+          config: .valint.yaml
+          verbose: 2
+          label: is_git_commit
+         
+
+  
