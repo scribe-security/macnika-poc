@@ -45,6 +45,17 @@ jobs:
           scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
           format: attest
           config: .valint.yaml
+
+    - name: Generate SLSA provenance docker image
+      uses: scribe-security/action-slsa@master
+      with:
+          target: 'buildimage:${{github.run_number}}'
+          scribe-enable: true
+          product-key:  ${{ env.APP_NAME }}
+          product-version: ${{env.PRODUCT_VERSION}} #${{env.GITHUB_RUN_NUM}}
+          scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
+          format: attest
+          config: .valint.yaml
           
 
     - name: Run the Docker image
