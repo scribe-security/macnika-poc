@@ -1,6 +1,6 @@
 name: Docker Image commit
 env:
-   APP_NAME: Mac-Github
+   APP_NAME: MacGithub
    PRODUCT_VERSION: 1.2.1
 on:
   workflow_dispatch:
