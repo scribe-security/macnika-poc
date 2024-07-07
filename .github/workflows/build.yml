@@ -1,0 +1,55 @@
+name: Docker Image CI with provenance
+env:
+   APP_NAME: Sky-Mapper
+   PRODUCT_VERSION: 1.2.1
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}
+
+    - name: Generate signed SBOM for repo content clone
+      uses: scribe-security/action-bom@master
+      with:
+          target: 'git:.'
+          scribe-enable: true
+          product-key: ${{ env.APP_NAME }}
+          product-version: ${{env.PRODUCT_VERSION}} #${{env.GITHUB_RUN_NUM}}
+          scribe-client-secret: ${{ secrets.SCRIBE_CLIENT_TOKEN }}
+          components: commits,packages,files,dep
+          format: attest
+          config: .valint.yaml
+          verbose: 2
+          deliverable: true
+
+    - name: Run the Docker image
+      run: |
+        docker run --rm --name web -p 8080:8080 -d "buildimage:${{github.run_number}}"
+        sleep 1 && curl http://localhost:8080
+        docker stop web
+
+    - name: "Twistlock Vuln/Compliance check"
+      env:
+        pc_user: ${{ secrets.PC_USER }}
+        pc_pass: ${{ secrets.PC_PASS }}
+        pc_url: ${{ secrets.PC_URL }}
+      run: |
+        curl -k -u "${pc_user}:${pc_pass}" --output twistcli "${pc_url}/api/v1/util/twistcli" 
+        chmod a+x twistcli
+        sudo ./twistcli images scan --address "${pc_url}" -u "${pc_user}" -p "${pc_pass}" "buildimage:${{github.run_number}}" --details
+
+#    - name: "Triage vulnerabilities"
+#      run: |
+#        ./getPrismaData.sh
+#        ./triage.sh
