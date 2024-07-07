@@ -15,9 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}
-
+    
     - name: Generate signed SBOM for repo content clone
       uses: scribe-security/action-bom@master
       with:
