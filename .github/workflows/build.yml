@@ -1,7 +1,7 @@
 name: Docker Image CI with provenance
 env:
    APP_NAME: MacGithub
-   PRODUCT_VERSION: 1.2.3
+   PRODUCT_VERSION: 1.2.4
 on:
   workflow_dispatch:
 
@@ -14,7 +14,9 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}
 
