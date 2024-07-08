@@ -1,7 +1,7 @@
 name: Docker Image CI with provenance
 env:
    APP_NAME: MacGithub
-   PRODUCT_VERSION: 1.2.4
+   PRODUCT_VERSION: 1.2.5
 on:
   workflow_dispatch:
 
@@ -17,9 +17,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}
-
     - name: Generate signed SBOM for repo content clone
       uses: scribe-security/action-bom@master
       with:
@@ -32,7 +29,8 @@ jobs:
           format: attest
           config: .valint.yaml
           verbose: 2
-         
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag buildimage:${{github.run_number}}        
 
     - name: Generate signed SBOM for docker image
       uses: scribe-security/action-bom@master
