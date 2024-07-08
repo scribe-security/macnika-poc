@@ -14,7 +14,10 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v4
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
     
     - name: Generate signed SBOM for repo content clone
       uses: scribe-security/action-bom@master
