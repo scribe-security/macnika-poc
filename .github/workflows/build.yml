@@ -1,7 +1,7 @@
 name: Docker Image CI with provenance
 env:
    APP_NAME: MacGithub
-   PRODUCT_VERSION: 1.2.5
+   PRODUCT_VERSION: 1.2.6
 on:
   workflow_dispatch:
 
