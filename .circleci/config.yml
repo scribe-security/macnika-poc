@@ -78,6 +78,19 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
+
+      - scribe/verify:
+          target: "buildimage:${CIRCLE_BUILD_NUM}"
+          verbose: 2
+          scribe-enable: true
+          product-key: circle.pre-release.bom
+          scribe-client-secret: $scribetoken
+          format: "attest"
+          attest-default: x509
+          key: key.pem
+          cert: cert.pem
+          ca: ca.pem
+          rule: slsa/l2-provenance-authenticated@v1
           
 
       - run:
