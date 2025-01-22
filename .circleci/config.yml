@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
-  orbs: scribe-security/orbs@1.4.2
-  scribe: scribe-security/orbs@1.4.2
+  orbs: scribe-security/orbs@1.5.15
+  scribe: scribe-security/orbs@1.5.15
 
 
 executors:
