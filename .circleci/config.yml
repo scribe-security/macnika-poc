@@ -78,7 +78,7 @@ jobs:
           key: key.pem
           cert: cert.pem
           ca: ca.pem
-          context-type: github
+          
 
       - run:
           name: "simple test"
